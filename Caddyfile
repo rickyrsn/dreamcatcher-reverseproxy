@@ -8,16 +8,20 @@
 #     https_port 443
 # }
 
-# # Enable global security settings
-# {
-#     header / {
-#         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-#         X-Content-Type-Options "nosniff"
-#         X-Frame-Options "DENY"
-#         X-XSS-Protection "1; mode=block"
-#         Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
-#     }
-# }
+# Enable global security settings
+{
+    header / {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
+        Host {host}
+        X-Real-IP {>CF-Connecting-IP}
+        X-Forwarded-For {>CF-Connecting-IP}
+        X-Forwarded-Proto {scheme}
+    }
+}
 
 # # Enable global rate limiting
 # {
@@ -75,12 +79,5 @@
 beruangrak.us {
     route /api/webhooks/* {
         reverse_proxy http://172.16.0.11:9000{uri}
-        header_upstream Host {host}
-        header_upstream X-Real-IP {>CF-Connecting-IP}
-        header_upstream X-Forwarded-For {>CF-Connecting-IP}
-        header_upstream X-Forwarded-Proto {scheme}
-    }
-    route /wordpress/* {
-        reverse_proxy wordpress:80
     }
 }
