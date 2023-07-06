@@ -1,6 +1,8 @@
 # Use the official Caddy v2 base image
 FROM caddy:2.4.0-alpine
 
+RUN apk add --no-cache openssl
+
 # Set environment variables
 ENV CADDYPATH /etc/caddy/.caddy
 
