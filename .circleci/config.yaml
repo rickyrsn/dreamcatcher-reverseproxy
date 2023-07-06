@@ -1,0 +1,28 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8
+
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          version: 20.10.7
+
+      - run:
+          name: Build Docker image
+          command: |
+            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            if [ "$CIRCLE_BRANCH" == "master" ] || [ "$CIRCLE_BRANCH" == "main" ]; then
+              docker build -t $DOCKER_USERNAME/caddy-proxy:$(git rev-parse --short HEAD) -f Dockerfile .
+              docker tag $DOCKER_USERNAME/caddy-proxy:$(git rev-parse --short HEAD) $DOCKER_USERNAME/caddy-proxy:latest
+              docker push $DOCKER_USERNAME/caddy-proxy:$(git rev-parse --short HEAD)
+              docker push $DOCKER_USERNAME/caddy-proxy:latest
+            fi
+
+workflows:
+  version: 2.1
+  build_and_push:
+    jobs:
+      - build

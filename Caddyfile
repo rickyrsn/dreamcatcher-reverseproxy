@@ -1,0 +1,90 @@
+{
+    email rickzz.corby@gmail.com
+}
+
+# Enable global HTTPS settings
+{
+    http_port 80
+    https_port 443
+    automatic_https
+    tls {
+        dns cloudflare
+    }
+}
+
+# Enable global security settings
+{
+    header / {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
+    }
+}
+
+# Enable global rate limiting
+{
+    @rate_limited {
+        ip {
+            rate_limit requests 60 1m
+        }
+    }
+    handle @rate_limited {
+        respond "Too many requests, please try again later." 429
+    }
+}
+
+# Enable global request filtering
+{
+    @blocked_request {
+        not remote_ip 192.168.1.0/24  # Whitelist local network
+        not remote_ip 173.245.48.0/20  # Whitelist Cloudflare IP range 1
+        not remote_ip 103.21.244.0/22  # Whitelist Cloudflare IP range 2
+        not remote_ip 103.22.200.0/22  # Whitelist Cloudflare IP range 3
+        not remote_ip 103.31.4.0/22    # Whitelist Cloudflare IP range 4
+        not remote_ip 141.101.64.0/18  # Whitelist Cloudflare IP range 5
+        not remote_ip 108.162.192.0/18 # Whitelist Cloudflare IP range 6
+        not remote_ip 190.93.240.0/20  # Whitelist Cloudflare IP range 7
+        not remote_ip 188.114.96.0/20  # Whitelist Cloudflare IP range 8
+        not remote_ip 197.234.240.0/22 # Whitelist Cloudflare IP range 9
+        not remote_ip 198.41.128.0/17  # Whitelist Cloudflare IP range 10
+        not remote_ip 162.158.0.0/15   # Whitelist Cloudflare IP range 11
+        not remote_ip 104.16.0.0/12    # Whitelist Cloudflare IP range 12
+        not remote_ip 172.64.0.0/13    # Whitelist Cloudflare IP range 13
+    }
+    handle @blocked_request {
+        respond "Access denied." 403
+    }
+}
+
+# Enable global no indexing
+{
+    @no_index {
+        header / {
+            X-Robots-Tag "noindex, nofollow"
+        }
+    }
+    handle @no_index {
+        respond "Page not found." 404
+    }
+}
+
+# Default server block
+:80 {
+    redir https://{host}{uri} 301
+}
+
+# Example vhost configuration
+beruangrak.us {
+    route /api/webhooks/* {
+        reverse_proxy http://172.16.0.11:9000$uri
+        header_upstream Host {host}
+        header_upstream X-Real-IP {>CF-Connecting-IP}
+        header_upstream X-Forwarded-For {>CF-Connecting-IP}
+        header_upstream X-Forwarded-Proto {scheme}
+    }
+    route /wordpress/* {
+        reverse_proxy wordpress:80
+    }
+}
