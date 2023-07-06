@@ -7,9 +7,9 @@ RUN apk add --no-cache openssl
 ENV CADDYPATH /etc/caddy/.caddy
 
 # Copy Caddyfile to the container
-COPY Caddyfile.encrypted /etc/caddy/Caddyfile
+COPY Caddyfile.encrypted /etc/caddy/Caddyfile.encrypted
 
-RUN openssl aes-256-cbc -d -a -in Caddyfile.encrypted -out Caddyfile -pass "pass:$PASSPHRASE"
+RUN openssl aes-256-cbc -d -a -in /etc/caddy/Caddyfile.encrypted -out /etc/caddy/Caddyfile -pass "pass:$PASSPHRASE"
 
 # Expose the HTTP and HTTPS ports
 EXPOSE 80 443
