@@ -6,10 +6,6 @@
 {
     http_port 80
     https_port 443
-    automatic_https
-    tls {
-        dns cloudflare
-    }
 }
 
 # Enable global security settings
