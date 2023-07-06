@@ -73,5 +73,5 @@ beruangrak.us {
         X-Forwarded-For {>CF-Connecting-IP}
         X-Forwarded-Proto {scheme}
     }
-    reverse_proxy /api/webhooks/* http://172.16.0.11:9000{uri}
+    reverse_proxy /api/webhooks/* http://172.16.0.11:9000
 }
