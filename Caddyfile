@@ -74,7 +74,7 @@
 # Example vhost configuration
 beruangrak.us {
     route /api/webhooks/* {
-        reverse_proxy http://172.16.0.11:9000$uri
+        reverse_proxy http://172.16.0.11:9000/$uri
         header_upstream Host {host}
         header_upstream X-Real-IP {>CF-Connecting-IP}
         header_upstream X-Forwarded-For {>CF-Connecting-IP}
