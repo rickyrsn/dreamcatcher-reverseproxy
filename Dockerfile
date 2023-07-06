@@ -5,7 +5,9 @@ FROM caddy:2.4.0-alpine
 ENV CADDYPATH /etc/caddy/.caddy
 
 # Copy Caddyfile to the container
-COPY Caddyfile /etc/caddy/Caddyfile
+COPY Caddyfile.encrypted /etc/caddy/Caddyfile
+
+RUN openssl aes-256-cbc -d -a -in Caddyfile.encrypted -out Caddyfile -pass "pass:$PASSPHRASE"
 
 # Expose the HTTP and HTTPS ports
 EXPOSE 80 443

@@ -62,6 +62,9 @@
 
 # Example vhost configuration
 beruangrak.us {
+    tls {
+	dns cloudflare q-eQqjJnq40lkJXGgwLS0UduKT4KnbVbKf1mgjwZ
+}
     header / {
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
         X-Content-Type-Options "nosniff"
